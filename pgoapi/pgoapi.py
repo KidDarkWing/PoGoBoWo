@@ -242,7 +242,7 @@ class PGoApi:
             raise AuthException("Token probably expired?")
         self.log.debug('Heartbeat dictionary: \n\r{}'.format(json.dumps(res, indent=2)))
 
-        if 'GET_PLAYER' in res['responses']:
+        if 'GET_PLAYER' in res['responses'] and self._heartbeat_number % 10 == 0:
             player_data = res['responses'].get('GET_PLAYER', {}).get('player_data', {})
             if os.path.isfile("accounts/%s.json" % self.config['username']):
                 with open("accounts/%s.json" % self.config['username'], "r") as f:
@@ -262,7 +262,7 @@ class PGoApi:
                 res['responses']['lat'] = self._posf[0]
                 res['responses']['lng'] = self._posf[1]
                 f.write(json.dumps(res['responses'], indent=2))
-            self.log.info("List of Pokemon:\n" + get_inventory_data(res, self.pokemon_names) + "\nTotal Pokemon count: " + str(get_pokemon_num(res)) + "\nEgg Hatching status: " + get_incubators_stat(res))
+            #self.log.info("List of Pokemon:\n" + get_inventory_data(res, self.pokemon_names) + "\nTotal Pokemon count: " + str(get_pokemon_num(res)) + "\nEgg Hatching status: " + get_incubators_stat(res))
             self.log.debug(self.cleanup_inventory(res['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']))
 
         self._heartbeat_number += 1
@@ -275,7 +275,7 @@ class PGoApi:
             for i, next_point in enumerate(get_increments(self._posf, step, self.config.get("STEP_SIZE", 200))):
                 self.set_position(*next_point)
                 self.heartbeat()
-                self.log.info("Sleeping before next heartbeat")
+                #self.log.info("Sleeping before next heartbeat")
                 sleep(2)  # If you want to make it faster, delete this line... would not recommend though
                 # make sure we have atleast 1 ball
                 if sum(self.pokeballs) > 0:
@@ -398,7 +398,7 @@ class PGoApi:
                                     self.log.info("Evolving pokemon: %s", self.pokemon_names[str(pokemon['pokemon_id'])])
                                     self.evolve_pokemon(pokemon_id=pokemon['id'])
                         self.log.debug("Releasing pokemon: %s", pokemon)
-                        self.log.info("Releasing pokemon: %s IV: %s", self.pokemon_names[str(pokemon['pokemon_id'])], pokemon_iv_percentage(pokemon))
+                        self.log.info("Releasing pokemon: %s IV: %s CP: %s", self.pokemon_names[str(pokemon['pokemon_id'])], pokemon_iv_percentage(pokemon), pokemon['cp'])
                         self.release_pokemon(pokemon_id=pokemon["id"])
 
         if self.RELEASE_DUPLICATES:
@@ -413,14 +413,14 @@ class PGoApi:
                                 if pokemon['cp'] * self.DUPLICATE_CP_FORGIVENESS < last_pokemon['cp']:
                                     # release the lesser!
                                     self.log.debug("Releasing pokemon: %s", last_pokemon)
-                                    self.log.info("Releasing pokemon: %s IV: %s", self.pokemon_names[str(last_pokemon['pokemon_id'])], pokemon_iv_percentage(last_pokemon))
+                                    self.log.info("Releasing pokemon: %s IV: %s CP: %s", self.pokemon_names[str(last_pokemon['pokemon_id'])], pokemon_iv_percentage(last_pokemon), last_pokemon['cp'])
                                     self.release_pokemon(pokemon_id=last_pokemon["id"])
                                 last_pokemon = pokemon
                             else:
                                 if last_pokemon['cp'] * self.DUPLICATE_CP_FORGIVENESS > pokemon['cp']:
                                     # release the lesser!
                                     self.log.debug("Releasing pokemon: %s", pokemon)
-                                    self.log.info("Releasing pokemon: %s IV: %s", self.pokemon_names[str(pokemon['pokemon_id'])], pokemon_iv_percentage(pokemon))
+                                    self.log.info("Releasing pokemon: %s IV: %s CP: %s", self.pokemon_names[str(pokemon['pokemon_id'])], pokemon_iv_percentage(pokemon), pokemon['cp'])
                                     self.release_pokemon(pokemon_id=pokemon["id"])
 
                         else:
