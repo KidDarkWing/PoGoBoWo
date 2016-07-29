@@ -28,13 +28,7 @@ import os.path
 logger = logging.getLogger(__name__)
 
 # Candy needed to evolve pokemon  to add new pokemon to auto evolve list edit them here
-CANDY_NEEDED_TO_EVOLVE = {1: 24,  # Bulbasaur
-                          2: 99,  # Ivysaur
-                          4: 24,  # Charmander
-                          5: 99,  # Charmeleon
-                          7: 24,  # Squirtle
-                          8: 99,  # Wartortle
-                          10: 11,  # Caterpie
+CANDY_NEEDED_TO_EVOLVE = {10: 11,  # Caterpie
                           11: 49,  # Metapod
                           13: 11,  # Weedle
                           14: 49,  # Kakuna
@@ -43,61 +37,10 @@ CANDY_NEEDED_TO_EVOLVE = {1: 24,  # Bulbasaur
                           19: 24,  # Rattata
                           21: 49,  # Spearow
                           23: 49,  # Ekans
-                          25: 49,
-                          27: 49,
-                          29: 24,
-                          30: 99,
-                          32: 24,
-                          33: 99,
-                          35: 49,
-                          37: 49,
-                          39: 50,
-                          41: 44,
-                          43: 24,
-                          44: 99,
-                          46: 49,
-                          48: 49,
-                          50: 49,
-                          52: 49,
-                          54: 49,
-                          56: 49,
-                          58: 49,
+                          41: 49,  # Zubat
                           60: 24,  # Poliwag
-                          61: 99,
-                          63: 24,
-                          64: 99,
-                          66: 24,
-                          67: 99,
-                          69: 24,
-                          70: 99,
-                          72: 49,
-                          74: 24,
-                          75: 99,
-                          77: 49,
-                          79: 49,
-                          81: 49,
-                          84: 49,
-                          86: 49,
-                          88: 49,
-                          90: 49,  # Shellder
-                          92: 24,
-                          93: 99,
-                          96: 49,  # Drowzee
-                          98: 49,
-                          100: 49,
-                          102: 49,
-                          104: 49,
-                          109: 49,
-                          111: 49,
-                          116: 49,
-                          118: 49,
-                          120: 49,
-                          129: 399,
-                          133: 24,
-                          138: 49,
-                          140: 49,
-                          147: 24,
-                          148: 99}
+                          84: 49,  # Doduo
+                          }
 
 POKEBALLS = ["Pokeball", "Great Ball", "Ultra Ball", "Master Ball"]  # you only get one master ball dont waste it botting
 
