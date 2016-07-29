@@ -102,3 +102,4 @@ data_dumps/*.json
 
 .idea
 *.iml
+*.bat

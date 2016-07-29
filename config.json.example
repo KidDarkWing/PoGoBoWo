@@ -13,6 +13,7 @@
         "STEP_SIZE": 100,
         "RETURN_START_INTERVAL": 20,
         "MAX_BALL_TYPE": 2,
+        "RANDOM_SLEEP_TIME": 0,
         "MIN_ITEM_COUNTS": {
             "ITEM_POKE_BALL": 15,
             "ITEM_GREAT_BALL": 25,
@@ -40,6 +41,7 @@
         "STEP_SIZE": 100,
         "RETURN_START_INTERVAL": 20,
         "MAX_BALL_TYPE": 2,
+        "RANDOM_SLEEP_TIME": 0,
         "MIN_ITEM_COUNTS": {
             "ITEM_POKE_BALL": 15,
             "ITEM_GREAT_BALL": 25,
