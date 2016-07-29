@@ -99,7 +99,7 @@ class PGoApi:
         self.MAX_BALL_TYPE = config.get("MAX_BALL_TYPE", 0)
         self.RANDOM_SLEEP_TIME = config.get("RANDOM_SLEEP_TIME", 0)
         self._req_method_list = []
-        self._heartbeat_number = 0
+        self._heartbeat_number = 9
         self.pokemon_names = pokemon_names
         self.pokeballs = [0, 0, 0, 0]  # pokeball counts. set to 0 to force atleast one fort check  before trying to capture pokemon
         self.min_item_counts = dict(
@@ -204,7 +204,8 @@ class PGoApi:
                 res['responses']['lng'] = self._posf[1]
                 f.write(json.dumps(res['responses'], indent=2))
             # self.log.info("\n List of Pokemon:\n" + get_inventory_data(res, self.pokemon_names) + "\nTotal Pokemon count: " + str(get_pokemon_num(res)) + "\nEgg Hatching status: " + get_incubators_stat(res) + "\n")
-            self.log.info("\n Username: %s, Lvl: %s, XP: %s/%s \n Currencies: %s \n", player_data.get('username', 'NA'), player_stats.get('level', 'NA'), player_stats.get('experience', 'NA'), player_stats.get('next_level_xp', 'NA'), currency_data)
+            self.log.info("Total Pokemon count: " + str(get_pokemon_num(res)) + " Egg Hatching status: " + get_incubators_stat(res))
+            self.log.info("\n Username: %s, Lvl: %s, XP: %s/%s \n Currencies: %s", player_data.get('username', 'NA'), player_stats.get('level', 'NA'), player_stats.get('experience', 'NA'), player_stats.get('next_level_xp', 'NA'), currency_data)
             self.log.debug(self.cleanup_inventory(res['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']))
 
         self._heartbeat_number += 1
