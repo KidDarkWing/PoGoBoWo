@@ -37,7 +37,10 @@ def get_incubators_stat(res):
     inventory_items = inventory_delta.get('inventory_items', [])
     inventory_items_incubators = map(lambda x: x.get('inventory_item_data', {}), inventory_items)
     inventory_items_dict_list = map(lambda x: x.get('egg_incubators', {}), inventory_items_incubators)
-    inventory_items_incubator_list = filter(lambda x: 'egg_incubator' in x, inventory_items_dict_list)
-    return (os.linesep.join(map(lambda x: "Incubator {0:.2f} km, walked {1:.2f} km".format(
-        x['egg_incubator']['target_km_walked'],
-        x['egg_incubator']['start_km_walked']), inventory_items_incubator_list)))
+    inventory_items_incubator_list = filter(lambda x: 'egg_incubator' in x and 'target_km_walked' in x, inventory_items_dict_list)
+    if inventory_items_incubator_list:
+        return (os.linesep.join(map(lambda x: "Incubator {0:.2f} km, walked {1:.2f} km".format(
+            x['egg_incubator']['target_km_walked'],
+            x['egg_incubator']['start_km_walked']), inventory_items_incubator_list)))
+    else:
+        return 'No incubators'
