@@ -214,6 +214,8 @@ class PGoApi:
             if len(not_inclubate_eggs_list)>0 and len(available_incubators_list)>0:
                 self.log.info("Hatching Egg")
                 self.use_item_egg_incubator(item_id=available_incubators_list[0]['id'], pokemon_id=not_inclubate_eggs_list[0]['pokemon_data']['id'])
+        if self._heartbeat_number % 30 == 0:
+            self.get_hatched_eggs()
 
         self._heartbeat_number += 1
         return res
