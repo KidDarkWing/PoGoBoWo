@@ -20,7 +20,7 @@ import random
 import json
 from pgoapi.location import distance_in_meters, get_increments, get_neighbors, get_route, filtered_forts
 # import pgoapi.protos.POGOProtos.Enums_pb2 as RpcEnum
-from pgoapi.poke_utils import pokemon_iv_percentage, get_inventory_data, get_pokemon_num, get_incubators_stat
+from pgoapi.poke_utils import pokemon_iv_percentage, get_inventory_data, get_not_inclubate_eggs_list, get_available_incubators_list, get_pokemon_num, get_incubators_stat
 from time import sleep
 from collections import defaultdict
 import os.path
@@ -38,7 +38,7 @@ CANDY_NEEDED_TO_EVOLVE = {10: 11,  # Caterpie
                           21: 49,  # Spearow
                           23: 49,  # Ekans
                           41: 49,  # Zubat
-                          60: 24,  # Poliwag
+                          # 60: 24,  # Poliwag
                           84: 49,  # Doduo
                           }
 
@@ -204,9 +204,16 @@ class PGoApi:
                 res['responses']['lng'] = self._posf[1]
                 f.write(json.dumps(res['responses'], indent=2))
             # self.log.info("\n List of Pokemon:\n" + get_inventory_data(res, self.pokemon_names) + "\nTotal Pokemon count: " + str(get_pokemon_num(res)) + "\nEgg Hatching status: " + get_incubators_stat(res) + "\n")
-            self.log.info("Total Pokemon count: " + str(get_pokemon_num(res)) + " Egg Hatching status: " + get_incubators_stat(res))
+            self.log.info("Total Pokemon count: " + str(get_pokemon_num(res)))
+            self.log.info("Egg Hatching status: " + get_incubators_stat(res))
             self.log.info("\n Username: %s, Lvl: %s, XP: %s/%s \n Currencies: %s", player_data.get('username', 'NA'), player_stats.get('level', 'NA'), player_stats.get('experience', 'NA'), player_stats.get('next_level_xp', 'NA'), currency_data)
             self.log.debug(self.cleanup_inventory(res['responses']['GET_INVENTORY']['inventory_delta']['inventory_items']))
+
+            not_inclubate_eggs_list = get_not_inclubate_eggs_list(res)
+            available_incubators_list = get_available_incubators_list(res)
+            if len(not_inclubate_eggs_list)>0 and len(available_incubators_list)>0:
+                self.log.info("Hatching Egg")
+                self.use_item_egg_incubator(item_id=available_incubators_list[0]['id'], pokemon_id=not_inclubate_eggs_list[0]['pokemon_data']['id'])
 
         self._heartbeat_number += 1
         return res
