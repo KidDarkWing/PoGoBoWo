@@ -26,10 +26,17 @@ def get_inventory_data(res, poke_names):
         inventory_items_pokemon_list,
         key=lambda pokemon: pokemon['pokemon_data']['cp']
     )
-    return (os.linesep.join(map(lambda x: "{0}, CP {1}, IV {2:.2f}".format(
-        poke_names[str(x['pokemon_data']['pokemon_id'])].encode('ascii', 'ignore'),
-        x['pokemon_data']['cp'],
-        pokemon_iv_percentage(x['pokemon_data'])), inventory_items_pokemon_list_sorted)))
+
+    pk_list = "\n" # formating to make the pokemon list more readable
+    i = 0
+    for x in inventory_items_pokemon_list_sorted:
+        r = "{0} CP:{1} IV:{2:.2f}".format(poke_names[str(x['pokemon_data']['pokemon_id'])].encode('ascii', 'ignore'), x['pokemon_data']['cp'], pokemon_iv_percentage(x['pokemon_data']))
+        i += 1
+        if i % 3 == 0:
+            pk_list += "{0: <30}\n".format(r)
+        else:
+            pk_list += "{0: <30}".format(r)
+    return pk_list
 
 def get_not_inclubate_eggs_list(res):
     inventory_delta = res['responses']['GET_INVENTORY'].get('inventory_delta', {})
