@@ -94,7 +94,7 @@ def main():
 
     if not api.login(config.auth_service, config.username, config.password, config.cached):
         return
-    get_GPX()
+    api.get_GPX()
     while True:
         try:
             api.main_loop()
