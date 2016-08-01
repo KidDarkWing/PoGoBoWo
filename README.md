@@ -22,6 +22,7 @@ If your bot stops working all of a sudden and doesn't move, input your latitude 
 + Auto top up pokeballs
 + Google API for location
 + Multi account support (just add more entries in config.json)
++ Includes a basic web UI to monitor your bot
 
 ### Instructions
 1. Fork/Clone project. `git clone https://github.com/BoBeR182/PoGoBoWo`.
@@ -37,6 +38,9 @@ If your bot stops working all of a sudden and doesn't move, input your latitude 
 9. When running the bot for the first time add `--cache` to the end.
 10. ???
 11. Profit.
+
+99. You can now open your browser and navigate to `http://localhost:3001` and checkout your bot's progress.  
+You can change the port by changing the `PORT` env var. eg start your bot with `PORT=8080 python pokebot.py -i 0`.
 
 ## Contibuting and TODO
 

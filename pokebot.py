@@ -11,6 +11,7 @@ import json
 import logging
 # import requests
 import argparse
+import thread
 from time import sleep
 from pgoapi import PGoApi
 # from pgoapi.utilities import f2i, h2f
@@ -18,6 +19,7 @@ from pgoapi import PGoApi
 
 # from google.protobuf.internal import encoder
 from geopy.geocoders import GoogleV3
+from web import start_server
 # from s2sphere import CellId, LatLng
 
 import pgoapi.globalvars # import global variables module currently used for tracking the used Gmaps API keys to prevent extra requests to bad keys # noqa
@@ -66,7 +68,7 @@ def init_config():
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
+    logging.basicConfig(level=logging.WARNING, format='%(asctime)s [%(module)10s] [%(levelname)5s] %(message)s')
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("pgoapi").setLevel(logging.INFO)  # FIXME we need to work on what should be show normally and what should be shown durin debug
     logging.getLogger("rpc_api").setLevel(logging.INFO)
@@ -87,6 +89,8 @@ def main():
     pokemon_names = json.load(open("name_id.json"))
 
     api = PGoApi(config.__dict__, pokemon_names, position)
+
+    thread.start_new_thread(start_server, (api,))
 
     if not api.login(config.auth_service, config.username, config.password, config.cached):
         return

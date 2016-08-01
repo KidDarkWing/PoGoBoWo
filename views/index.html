@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+<script src="https://rawgit.com/allenhwkim/angularjs-google-maps/master/build/scripts/ng-map.min.js"></script>
+<body>
+
+<style>
+h1, h2, h3, h4 {
+    margin: 0;
+    margin-bottom: 10px;
+}
+ul, li {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+#container {
+    font-family: arial;
+    font-size: 13px;
+    width: 100%;
+    max-width: 700px;
+    margin: 2em auto;
+}
+.map {
+    width: 100%;
+    height: 350px;
+    margin-bottom: 1em;
+}
+.cols {
+    -moz-column-count: 2;
+    -moz-column-gap: 2%;
+    -moz-column-width: 40%;
+    -webkit-column-count: 2;
+    -webkit-column-gap: 2%;
+    -webkit-column-width: 40%;
+    column-count: 2;
+    column-gap: 2%;
+    column-width: 40%;
+}
+.box {
+    margin-bottom: 20px;
+    padding: 10px;
+    /*overflow: scroll;*/
+}
+.box.one {
+    background-color: #d77575;
+    /*height: 300px;*/
+}
+.box.two {
+    background-color: #dcbc4c;
+    /*height: 300px;*/
+}
+.box.three {
+    background-color: #a3ca3b;
+    /*height: 400px;*/
+}
+.box.four {
+    background-color: #3daee3;
+    height: 500px;
+}
+.box.five {
+    background-color: #bb8ed8;
+    height: 600px;
+}
+.box.six {
+    background-color: #baafb1;
+    height: 200px;
+}
+</style>
+
+<script>
+var app = angular.module('pogo', ['ngMap'])
+app.service('pogo', function() {
+    this.getInventory = function (x) {
+        return x.toString(16);
+    }
+})
+app.controller("homeCtrl", function($scope, $interval, $http) {
+    $scope.updateInventory = function updateInventory() {
+        $http.get('/api/inventory').then(function successCb(response) {
+            // console.log('inventory', response)
+            $scope.inventory = response.data
+
+            response.data.forEach(function processItem(item, i) {
+                if (item.inventory_item_data && item.inventory_item_data.player_stats) {
+                    $scope.stats = item.inventory_item_data.player_stats
+                }
+            })
+
+        }, function errorCb(response){
+            console.error(response)
+        })
+    }
+
+    $scope.isPokemon = function(item){
+        if (item.inventory_item_data.pokemon_data) {
+            if ((item.inventory_item_data.pokemon_data.pokemon_id || 0) > 0) {
+              return true
+            }
+        }
+        return false
+    }
+
+    $http.get('/api/pokemon_names').then(function successCb(response) {
+        // console.log('names', response)
+        $scope.names = response.data
+        $scope.updateInventory()
+    }, function errorCb(response){
+        console.error(response)
+    })
+
+    $scope.iv = function calcIV(pokemon) {
+        // console.log('pokemon iv', pokemon)
+        var _ia = pokemon.individual_attack || 0
+        var _id = pokemon.individual_defense || 0
+        var _is = pokemon.individual_stamina || 0
+        var _iv = ((_ia + _id + _is) / 45.0) * 100.0
+        return Math.round(_iv * 100) / 100
+    }
+
+    $http.get('/api/player').then(function successCb(response) {
+        // console.log('player', response)
+        $scope.player = response.data
+    }, function errorCb(response){
+        console.error(response)
+    })
+
+    $scope.path = []
+
+    $scope.updateNearby = function(){
+        $http.get('/api/location').then(function successCb(response) {
+            // console.log('location', response)
+            $scope.location = response.data
+            $scope.path.push($scope.location)
+        }, function errorCb(response){
+            console.error(response)
+        })
+
+        $http.get('/api/nearby').then(function successCb(response) {
+            // console.log('nearby', response)
+            var cells = response.data
+            $scope.nearby = response.data
+
+            var nearby_forts = []
+            var nearby_pokemons = []
+            if (cells && cells.length > 0) {
+                cells.forEach(function processCell(cell, i) {
+                    if (cell.forts && cell.forts.length > 0) {
+                        cell.forts.forEach(function processPoint(point, j) {
+                            var icon = 'resources/icons/pokestop.png'
+                            if (!point.type) {
+                                icon = 'resources/icons/fort-' + (point.owned_by_team || '0') + '.png'
+                            } else if (point.type == 2) { // TODO(geoah) This is an assumption
+                                icon = 'resources/icons/pokestop-lured.png'
+                            }
+                            nearby_forts.push({
+                                id: point.id,
+                                lat: point.latitude,
+                                lng: point.longitude,
+                                icon: icon
+                            })
+                        })
+                    }
+                    if (cell.catchable_pokemons && cell.catchable_pokemons.length > 0) {
+                        cell.catchable_pokemons.forEach(function processPoint(point, j) {
+                            nearby_pokemons.push({
+                                id: point.spawn_point_id + '.' + point.pokemon_id,
+                                lat: point.latitude,
+                                lng: point.longitude,
+                                icon: 'resources/icons/' + point.pokemon_id +'.png',
+                                expiration: point.expiration_timestamp_ms
+                            })
+                        })
+                    }
+                })
+                $scope.nearby_forts = nearby_forts
+                $scope.nearby_pokemons = nearby_pokemons
+                // console.info('nearby_pokemons', nearby_pokemons)
+            }
+        }, function errorCb(response){
+            console.error(response)
+        })
+    }
+
+    $scope.updateNearby()
+    
+    $scope.autoUpdate = true
+    $interval(function() {
+        if ($scope.autoUpdate == true) {
+            $scope.updateNearby()
+        }
+    }, 2000);
+});
+</script>
+
+<div id="container" ng-app="pogo" ng-controller="homeCtrl">
+    <h1>PoGoWoBo <small>Pokemon Go Working Bot</small></h1>
+    <div>
+        <h3>Your location <small>(<a href="#" ng-click="updateNearby()">update</a>)</small></h3>
+        <ng-map zoom="17" center="[{{location.lat}}, {{location.lng}}]" class="map">
+            <marker position="{{point.lat}},{{point.lng}}" icon="{{point.icon}}" ng-repeat="point in nearby_forts track by point.id"></marker>
+            <marker position="{{point.lat}},{{point.lng}}" icon="{{point.icon}}" ng-repeat="point in nearby_pokemons track by point.id"></marker>
+            <marker position="{{location.lat}},{{location.lng}}" icon="{{point.icon}}"></marker>
+            <shape name="polyline" path="{{path}}" stroke-color="#FF0000" stroke-opacity="1.0" stroke-weight="2">
+        </ng-map>
+    </div>
+    <div class="cols">
+        <div class="box one">
+            <h3>You ({{player.username}}) <small>(<a href="#" ng-click="updateInventory()">update</a>)</small></h3>
+            <ul>
+                <li ng-repeat="(k, v) in stats">{{k}}: {{v}}</li>
+            </ul>
+        </div>
+        <div class="box two">
+            <h3>Your Pokemons <small>(<a href="#" ng-click="updateInventory()">update</a>)</small></h3>
+            <ul>
+                <li ng-repeat="item in inventory | orderBy:'-inventory_item_data.pokemon_data.cp' | filter:isPokemon:item.inventory_item_data.pokemon_data.pokemon_id">
+                <strong>{{names[item.inventory_item_data.pokemon_data.pokemon_id]}}</strong>
+                <small>
+                    CP {{item.inventory_item_data.pokemon_data.cp}};
+                    IV {{iv(item.inventory_item_data.pokemon_data)}};
+                    ST {{item.inventory_item_data.pokemon_data.stamina}}/{{item.inventory_item_data.pokemon_data.stamina_max}};
+                    IS {{item.inventory_item_data.pokemon_data.individual_attack}};
+                    ID {{item.inventory_item_data.pokemon_data.individual_defense}};
+                    IS {{item.inventory_item_data.pokemon_data.individual_stamina}};
+                </small>
+                </li>
+            </ul>
+        </div>
+        <!--<div class="box one"></div>-->
+        <!--<div class="box three"></div>-->
+        <!--<div class="box two"></div>-->
+        <!--<div class="box five"></div>-->
+        <!--<div class="box one"></div>-->
+        <!--<div class="box two"></div>-->
+        <!--<div class="box six"></div>-->
+        <!--<div class="box three"></div>-->
+        <!--<div class="box two"></div>-->
+    </div>
+</div>
+</body>
+</html>
+
