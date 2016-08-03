@@ -184,7 +184,7 @@ app.controller("homeCtrl", function($scope, $interval, $http) {
     }
 
     $scope.updateNearby()
-    
+
     $scope.autoUpdate = true
     $interval(function() {
         if ($scope.autoUpdate == true) {
@@ -195,7 +195,7 @@ app.controller("homeCtrl", function($scope, $interval, $http) {
 </script>
 
 <div id="container" ng-app="pogo" ng-controller="homeCtrl">
-    <h1>PoGoWoBo <small>Pokemon Go Working Bot</small></h1>
+    <h1><small>Pokemon Go Working Bot</small></h1>
     <div>
         <h3>Your location <small>(<a href="#" ng-click="updateNearby()">update</a>)</small></h3>
         <ng-map zoom="17" center="[{{location.lat}}, {{location.lng}}]" class="map">

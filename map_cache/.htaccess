@@ -1,0 +1,6 @@
+RewriteEngine on
+RewriteBase /maps
+
+RewriteRule ^index.php$ - [L]
+
+RewriteRule (.*) index.php?r=$1 [L,QSA]

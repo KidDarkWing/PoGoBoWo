@@ -395,11 +395,11 @@ class PGoApi:
                             if self.pokemon_names[str(pokemon['pokemon_id'])] == self.pokemon_names[str(last_pokemon['pokemon_id'])]:
                                 # Compare two pokemon if the larger IV pokemon has less then DUPLICATE_CP_FORGIVENESS times CP keep it
                                 if pokemon_iv_percentage(pokemon) > pokemon_iv_percentage(last_pokemon):
-                                    if pokemon['cp'] * self.DUPLICATE_CP_FORGIVENESS < last_pokemon['cp']:
+                                    if last_pokemon['cp'] * self.DUPLICATE_CP_FORGIVENESS < pokemon['cp']:
                                         try:
                                             atgym = len(last_pokemon['deployed_fort_id']) > 0
                                             if atgym:
-                                                self.log.info("Pokemon %s CP: %s not released because at gym", self.pokemon_names[str(last_pokemon['pokemon_id'])], pokemon['cp'])
+                                                self.log.info("Pokemon %s CP: %s not released because at gym", self.pokemon_names[str(last_pokemon['pokemon_id'])], last_pokemon['cp'])
                                         except:
                                             atgym = False
                                         if not atgym:
@@ -419,7 +419,6 @@ class PGoApi:
                                             self.log.debug("Releasing pokemon: %s", pokemon)
                                             self.log.info("Releasing pokemon: %s IV: %s CP: %s", self.pokemon_names[str(pokemon['pokemon_id'])], pokemon_iv_percentage(pokemon), pokemon['cp'])
                                             self.release_pokemon(pokemon_id=pokemon["id"])
-                                    last_pokemon = pokemon
 
         return self.call()
 
